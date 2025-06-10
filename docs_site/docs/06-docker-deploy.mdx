@@ -1,4 +1,5 @@
 ---
+id: docker-deploy
 title: Docker Deployment
 sidebar_position: 7
 ---
@@ -16,17 +17,17 @@ The `create-mcp-node` tool generates a `Dockerfile` optimized for Python applica
 cd your-model-node
 
 # Build the Docker image
-# Replace <your-username> and <node-name>
-docker build -t ghcr.io/<your-username>/<node-name>:v0.1.0 .
+# Replace <AJ-EN> and <node-name>
+docker build -t ghcr.io/<AJ-EN>/<node-name>:v0.1.0 .
 ```
-**Naming Convention:** We recommend using `ghcr.io/<your-github-username>/<your-repo-name>:<version-tag>` for images pushed to GitHub Container Registry.  
+**Naming Convention:** We recommend using `ghcr.io/<AJ-EN>/<your-repo-name>:<version-tag>` for images pushed to GitHub Container Registry.  
 See the [GitHub Container Registry docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry) for more details.
 
 ## Running Your Docker Container Locally
 
 ```bash
 # Run the container, mapping container port 5000 to host 5000
-docker run --rm -p 5000:5000 ghcr.io/<your-username>/<node-name>:v0.1.0
+docker run --rm -p 5000:5000 ghcr.io/<AJ-EN>/<node-name>:v0.1.0
 ```
 _The base image’s `CMD` already starts on port 5000; adjust `-p` if you changed `serve(port=...)`._
 
@@ -40,13 +41,13 @@ To make your model accessible to the MCP-Sim platform or other users, push it to
 
 1.  **Authenticate with GHCR:**
     ```bash
-    echo $GH_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
+    echo $GH_TOKEN | docker login ghcr.io -u <AJ-EN> --password-stdin
     ```
     (Use a Personal Access Token with `write:packages` and `read:packages` scopes.)
 
 2.  **Push the image:**
     ```bash
-    docker push ghcr.io/<your-username>/<node-name>:v0.1.0
+    docker push ghcr.io/<AJ-EN>/<node-name>:v0.1.0
     ```
 
 ## Router Auto-Registration
@@ -69,7 +70,7 @@ docker run --rm -p 5000:5000 \
   -e MCP_ROUTER_URL="http://<router-host>:5000" \
   -e MCP_NODE_URL="http://<this-node-public-host>:5000" \
   -e MCP_REGISTER_ON_STARTUP="true" \
-  ghcr.io/<your-username>/<node-name>:v0.1.0
+  ghcr.io/<AJ-EN>/<node-name>:v0.1.0
 ```
 
 ## Sample `docker-compose.yml` for Local Development
@@ -106,7 +107,7 @@ services:
     restart: unless-stopped
 
   climate-model:
-    image: ghcr.io/username/climate-node:v1.2 # Example pre-built image
+    image: ghcr.io/AJ-EN/climate-node:v1.2 # Example pre-built image
     ports:
       - "5002:5000"
     environment:
@@ -133,4 +134,4 @@ _Tip: Use `docker compose logs -f mcp-router` to tail router logs for debugging.
 
 This setup allows your models to discover and communicate with the router within the Docker network.
 
-See the [CI page](../05-local-testing) for how to push images automatically on merge.
+See the [CI page](local-testing) for how to push images automatically on merge.
