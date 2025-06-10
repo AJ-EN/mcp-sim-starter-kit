@@ -1,10 +1,11 @@
-name: Deploy Docs to GitHub Pages
+name: Deploy Documentation Site
 
 on:
   push:
     branches: [main]
+    # Corrected Path: Only run if files inside 'docs_site' change
     paths:
-      - 'docs/**'
+      - 'docs_site/**'
 
 permissions:
   contents: read
@@ -30,13 +31,17 @@ jobs:
         with:
           node-version: '18'
           cache: npm
-          cache-dependency-path: docs/package-lock.json
+          # Corrected Path: Point to the lock file inside docs_site
+          cache-dependency-path: docs_site/package-lock.json
           
       - name: Install dependencies
-        run: cd docs && npm ci
+        # Corrected Step: Use working-directory to run the command
+        working-directory: ./docs_site
+        run: npm ci
         
       - name: Build website
-        run: cd docs && npm run build
+        working-directory: ./docs_site
+        run: npm run build
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -44,7 +49,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/build
+          # Corrected Path: The build output is now here
+          path: ./docs_site/build
           
       - name: Deploy to GitHub Pages
         id: deployment

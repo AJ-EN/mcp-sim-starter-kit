@@ -7,13 +7,11 @@ const config: Config = {
   tagline: "Composable scientific micro-models",
   favicon: "img/favicon.ico",
 
-  // ✅ Fix these URLs:
-  url: "https://aj-en.github.io",  // Your GitHub Pages domain
-  baseUrl: "/mcp-sim/",            // Your repository name
-
-  // ✅ Update these to match your GitHub username:
-  organizationName: "AJ-EN",       // Your GitHub username
-  projectName: "mcp-sim",          // Your repository name
+  // --- CONFIGURATIONS FOR GITHUB PAGES DEPLOYMENT ---
+  url: "https://AJ-EN.github.io", // ✅ This is correct
+  baseUrl: "/mcp-sim-starter-kit/", // ✅ CORRECTED: Must match the repo name
+  organizationName: "AJ-EN", // ✅ This is correct
+  projectName: "mcp-sim-starter-kit", // ✅ CORRECTED: Must match the repo name
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -26,19 +24,21 @@ const config: Config = {
   themes: ["@docusaurus/theme-live-codeblock"],
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/AJ-EN/mcp-sim/tree/main/docs/',
+          sidebarPath: "./sidebars.ts",
+          // ✅ CORRECTED: Points to the new public repo
+          editUrl: "https://github.com/AJ-EN/mcp-sim-starter-kit/tree/main/",
         },
         blog: {
           showReadingTime: true,
-          editUrl: 'https://github.com/AJ-EN/mcp-sim/tree/main/docs/',
-          authorsMapPath: '../authors.yml',
+          // ✅ CORRECTED: Points to the new public repo
+          editUrl: "https://github.com/AJ-EN/mcp-sim-starter-kit/tree/main/",
+          // ✅ REMOVED: authorsMapPath was pointing to a deleted file
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
@@ -60,7 +60,8 @@ const config: Config = {
         },
         { to: "/blog", label: "Changelog", position: "left" },
         {
-          href: "https://github.com/AJ-EN/mcp-sim",  // ✅ Updated GitHub link
+          // ✅ CORRECTED: Points to the new public repo
+          href: "https://github.com/AJ-EN/mcp-sim-starter-kit",
           label: "GitHub",
           position: "right",
         },
