@@ -29,10 +29,7 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/AJ-EN/mcp-sim-starter-kit/tree/main/",
         },
-        blog: {
-          showReadingTime: true,
-          editUrl: "https://github.com/AJ-EN/mcp-sim-starter-kit/tree/main/",
-        },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -55,7 +52,6 @@ const config: Config = {
           label: "Documentation",
         },
         {
-          // ✅ CORRECTED: Points to the new public repo
           href: "https://github.com/AJ-EN/mcp-sim-starter-kit",
           label: "GitHub",
           position: "right",
