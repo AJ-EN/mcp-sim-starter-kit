@@ -1,4 +1,5 @@
 ---
+id: faq
 title: FAQ
 sidebar_position: 10
 ---
@@ -29,7 +30,7 @@ It's for scientists, engineers, researchers, and developers who work with mathem
 
 No, not necessarily. The default model node setup using the Python SDK and Flask is CPU-based and suitable for many types of models.  
 GPU support for computationally intensive models (e.g., deep learning) is planned for future SDK versions and custom node implementations.  
-If your model requires PyTorch + CUDA, you can base your Dockerfile on `nvidia/cuda` and expose GPU resources via Docker’s `--gpus` flag.
+If your model requires PyTorch + CUDA, you can base your Dockerfile on `nvidia/cuda` and expose GPU resources via Docker's `--gpus` flag.
 
 **How do credits work?**
 
@@ -54,7 +55,7 @@ We plan to release SDKs for other popular languages in the future.
 
 Models are versioned using semantic versioning (e.g., `1.0.0` for Major.Minor.Patch) specified in their `metadata.json`.  
 The `model_id` should also ideally include the major version (e.g., `my-model-v1`) to distinguish between non-backward-compatible versions.  
-See [Schema Spec](../04-schema-spec) for versioning rules.
+See [Schema Spec](schema-spec) for versioning rules.
 
 ## Contributing & Community
 
@@ -74,4 +75,4 @@ Join our Discord → [https://discord.gg/abc123](https://discord.gg/abc123)
 ---
 
 Have another question?  
-Feel free to [open an issue on GitHub](https://github.com/mcp-sim/mcp-sim-starter-kit/issues) or reach out to our team.
+Feel free to [open an issue on GitHub](https://github.com/AJ-EN/mcp-sim-starter-kit/issues) or reach out to our team.
