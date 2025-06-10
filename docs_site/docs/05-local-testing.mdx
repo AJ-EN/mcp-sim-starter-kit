@@ -1,0 +1,164 @@
+---
+title: Local Testing
+sidebar_position: 6
+---
+
+# Local Testing
+
+Thorough local testing is crucial for developing reliable MCP-Sim models. The `create-mcp-node` tool scaffolds a basic testing setup using `pytest`.
+
+_If you haven’t already, install test dependencies:_
+```bash
+pip install pytest pytest-asyncio
+```
+
+## Running Tests
+
+The default template includes a `tests/` directory with example tests.
+
+```bash
+# Navigate to your model's root directory
+cd your-model-node
+
+# Run all tests quietly
+pytest -q
+
+# Run tests with more verbosity
+pytest -v
+
+# Print output while debugging
+pytest -s
+
+# Run tests for a specific file
+pytest tests/test_model.py
+
+# Run a specific test function
+pytest tests/test_model.py::test_specific_capability
+```
+
+A typical `tests/test_model.py` might look like:
+
+```python title="tests/test_model.py"
+import pytest
+from hydro_runoff.node import HydroRunoff  # Adjust import to match your project
+from mcp_node_sdk import ExecutionContext
+
+@pytest.fixture
+def model_node():
+    return HydroRunoff()
+
+@pytest.mark.asyncio
+async def test_simulate_runoff_basic(model_node):
+    ctx = ExecutionContext(
+        request_id="t1",
+        capability="simulate_runoff",
+        input_data={"precip_mm": 20, "et_mm": 5}
+    )
+    result = await model_node.simulate_runoff(ctx)
+    assert "runoff_mm" in result
+    assert result["runoff_mm"] == pytest.approx(9.0)  # (20 - 5) * 0.6
+
+@pytest.mark.asyncio
+async def test_simulate_runoff_no_runoff(model_node):
+    ctx = ExecutionContext(
+        request_id="t2",
+        capability="simulate_runoff",
+        input_data={"precip_mm": 5, "et_mm": 10}
+    )
+    result = await model_node.simulate_runoff(ctx)
+    assert result["runoff_mm"] == pytest.approx(0.0)
+
+# Add more tests for edge cases, invalid inputs, etc.
+```
+
+## Pre-commit Hooks
+
+We strongly recommend using pre-commit hooks to automatically check and format your code before committing. This helps maintain code quality and consistency.
+
+**1. Install pre-commit:**
+```bash
+pip install pre-commit
+pre-commit install
+# Run all hooks manually the first time
+pre-commit run --all-files
+```
+
+**2. Configure `.pre-commit-config.yaml`:**
+Create a `.pre-commit-config.yaml` file in your model's root directory:
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-json
+    -   id: check-merge-conflict
+    -   id: check-added-large-files
+-   repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+    -   id: black
+        language_version: python3
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+    -   id: isort
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+    -   id: flake8
+# Optional: JSON Schema validation for metadata.json
+# -   repo: https://github.com/python-jsonschema/check-jsonschema
+#     rev: 0.28.2
+#     hooks:
+#       - id: check-jsonschema
+#         name: Check metadata.json
+#         files: ^metadata\.json$
+#         args: ["--schemafile", "schemas/metadata.schema.json"]
+```
+> Note: For `check-jsonschema`, use your actual schema path, e.g. `"schemas/metadata.schema.json"`.
+
+Now, `git commit` will automatically run these checks.
+
+## Continuous Integration (CI)
+
+The default template includes a basic GitHub Actions workflow in `.github/workflows/test.yml` that runs `pytest` on every push and pull request.
+
+```yaml title=".github/workflows/test.yml"
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install mcp-node-sdk pytest pytest-asyncio
+    - name: Test with pytest
+      run: |
+        pytest
+```
+
+**CI Badge Expectations:**
+Ensure your `README.md` includes a CI status badge:
+```markdown
+[![CI Status](https://github.com/mcp-sim/mcp-sim-starter-kit/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-sim/mcp-sim-starter-kit/actions/workflows/test.yml)
+```
+
+By implementing these local testing practices, you contribute to a more robust and reliable MCP-Sim ecosystem.

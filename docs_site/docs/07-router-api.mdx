@@ -1,0 +1,141 @@
+---
+title: Router API
+sidebar_position: 8
+---
+
+# Router API Reference
+
+The MCP Router acts as the central hub for discovering, validating, and executing models. It exposes two sets of APIs: one for model nodes to register and communicate, and another for client applications to interact with the platform.
+
+_See [Docker Deployment](../06-docker-deploy) for container environment variable examples._
+
+## Node-Facing Endpoints (for Model Nodes)
+
+These endpoints are used by individual MCP Model Nodes to interact with the Router.
+
+### `POST /mcp/register`
+
+Used by a model node to register itself with the router. The router will periodically check the node's health.
+
+**Request Body:** (abridged example)
+```json
+{
+  "model_id": "hydro_runoff_v1",
+  "version": "1.0.0",
+  "name": "Hydrology Runoff Model",
+  "node_url": "http://my-hydro-model:5000",
+  "endpoints": {
+    "execute": "/mcp/execute",
+    "health": "/health"
+  },
+  "capabilities": ["simulate_runoff"]
+}
+```
+
+**Response:**
+*   `200 OK`: Registration successful.
+*   `400 Bad Request`: Invalid metadata or missing `node_url`.
+*   `409 Conflict`: Node with same `model_id` and `node_url` already registered.
+
+### `POST /mcp/unregister`
+
+Used by a model node to gracefully unregister itself from the router (e.g., during shutdown).
+
+**Request Body:**
+```json
+{
+  "node_url": "http://my-hydro-model.example.com:5000"
+}
+```
+**Response:**
+*   `200 OK`: Unregistration successful.
+
+### `GET /mcp/health` (Implemented by Model Nodes, Called by Router)
+
+The router periodically calls this endpoint on registered model nodes to check their status. Model nodes must implement this.
+
+**Expected Response from Node:**
+```json
+{ "status": "ok" }
+// or
+{ "status": "degraded", "details": "..." }
+```
+_Router hits this endpoint every 30 seconds by default (configurable via `HEALTH_POLL_SEC`)._
+
+## Client-Facing Endpoints (for Client Applications)
+
+These endpoints are used by client applications, scripts, dashboards, or other services to interact with the MCP-Sim platform.
+
+### `GET /api/models`
+
+Retrieves a list of all registered and healthy models, including their full metadata.
+
+**Query Parameters (Optional):**
+*   `tag=<string>`: Filter models by a specific tag.
+*   `capability=<string>`: Filter models that have a specific capability.
+
+**Response:** `200 OK`
+```json
+[
+  { /* metadata of model 1 */ },
+  { /* metadata of model 2 */ }
+]
+```
+
+### `GET /api/models/{model_id}`
+
+Retrieves the full metadata for a specific model ID.
+
+**Query Parameters (Optional):**
+*   `verbose=true`: Include transient health metrics (if supported).
+
+**Response:** `200 OK`
+```json
+{ /* metadata of the requested model */ }
+```
+*   `404 Not Found`: If the model ID does not exist or is unhealthy.
+
+### `POST /api/execute`
+
+Executes a capability on a specific model. The router forwards the request to the appropriate model node.
+
+**Request Body:**
+```json
+{
+  "model_id": "hydro-runoff-v1", // Target model ID
+  "capability": "simulate_runoff", // Target capability name
+  "input_data": {
+    "precip_mm": 20,
+    "et_mm": 5
+  },
+  "request_id": "user-generated-uuid-123" // Optional: for client-side tracking; if omitted, router auto-generates a UUID.
+}
+```
+
+**Response:** `200 OK` (if model execution is successful)  
+The response body is the direct output from the model node's capability.
+```json
+{
+  "runoff_mm": 9.0
+}
+```
+**Error Responses:**
+*   `400 Bad Request`: Invalid request format, missing fields.
+*   `402 Payment Required`: User lacks credits (future).
+*   `404 Not Found`: `model_id` or `capability` not found.
+*   `409 Conflict`: Duplicate request ID.
+*   `500 Internal Server Error`: Error during model execution on the node, or router internal error. The response body may contain error details from the node.
+*   `503 Service Unavailable`: Model node is unhealthy or unreachable.
+
+### `POST /api/simulate` (Advanced Composition — Future)
+
+TBD — will accept DAG / JSON graph definition for orchestrating calls to multiple models.
+
+> ░ This endpoint is a placeholder for future model composition capabilities. It might involve specifying a chain or graph of models to execute. ░
+
+## Authentication & Authorization
+
+> Today, endpoints are open. Planned: JWT-based authentication via header `Authorization: Bearer <token>`.  
+> Future: credit system integration for paid calls.
+
+---

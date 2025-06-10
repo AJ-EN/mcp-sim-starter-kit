@@ -1,0 +1,100 @@
+---
+title: Quick Start
+sidebar_position: 2
+---
+
+# Quick Start ⚡
+
+Build and deploy your first scientific model as a live API in under 10 minutes.
+
+## Prerequisites
+
+* Python ≥ 3.9
+* Node.js ≥ 18 (required for the CLI)
+* Docker (optional but recommended)
+
+## 1 — Install SDK
+
+```bash
+pip install --upgrade pip
+pip install mcp-node-sdk            # ⬅️  core SDK
+# Confirm install:
+python -c "import mcp_node_sdk; print(mcp_node_sdk.__version__)"
+```
+
+## 2 — Scaffold a node
+
+```bash
+npx create-mcp-node hydro-runoff
+cd hydro-runoff
+```
+Expected output:
+```
+Creating MCP node: hydro-runoff…
+✅ Node 'hydro-runoff' created
+```
+
+**Folder anatomy:**
+
+```
+hydro-runoff/
+ ├─ node.py          # your model code
+ ├─ metadata.json    # machine‑readable contract
+ ├─ Dockerfile       # container configuration
+ └─ tests/           # unit test suite
+```
+
+## 3 — Add your formula
+
+```python title="node.py"
+from mcp_node_sdk import ModelNode, capability, ExecutionContext
+
+class HydroRunoffModel(ModelNode):
+    @capability("simulate_runoff")
+    async def simulate_runoff(self, ctx: ExecutionContext):
+        p = ctx.input_data["precip_mm"]
+        et = ctx.input_data["et_mm"]
+        runoff = max(0, 0.6 * (p - et))
+        return {"runoff_mm": runoff}
+
+if __name__ == "__main__":
+    HydroRunoffModel().serve()  # defaults to 0.0.0.0:5000; override if needed
+```
+
+## 4 — Run tests
+
+The template includes a passing test in `tests/`. Run:
+
+```bash
+pytest -q
+```
+
+## 5 — Build & run your container
+
+```bash
+docker build -t hydro-runoff .
+docker run --rm -p 5000:5000 hydro-runoff
+```
+_Maps container port 5000 to host 5000._
+
+## 6 — Call the API
+
+```bash
+curl -X POST localhost:5000/mcp/execute \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json" \
+     -d '{"capability":"simulate_runoff","input_data":{"precip_mm":20,"et_mm":5}}'
+# → {"runoff_mm":9}
+```
+
+🎉 **Congrats!** Your hydrology model is live.
+
+## Next Steps
+
+- **[Deploy with Docker →](06-docker-deploy)** – Container best practices  
+- **[Testing Guide →](05-local-testing)** – Quality assurance workflow  
+- **[Router Integration →](07-router-api)** – Connect to the platform
+
+---
+
+> _Tip: Add a terminal GIF or architecture diagram here for extra clarity!_

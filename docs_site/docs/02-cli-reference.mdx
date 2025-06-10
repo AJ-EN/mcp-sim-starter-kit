@@ -1,0 +1,92 @@
+---
+title: CLI Reference
+sidebar_position: 3
+---
+
+# CLI Reference — create‑mcp‑node
+
+The `create-mcp-node` CLI tool scaffolds new model projects with best practices built-in.
+
+## Basic Usage
+
+```bash
+npx create-mcp-node <project-name>
+```
+
+## Command Options
+
+| Flag                | Default | Description                                   |
+|---------------------|---------|-----------------------------------------------|
+| `--template <url>`  | _none_  | Use custom template repo                      |
+| `--no-tests`        | `false` | Skip generating the `tests/` folder           |
+| `--docker-off`      | `false` | Omit Dockerfile / Compose files               |
+| `--help`            | —       | Show help information                         |
+
+## Examples
+
+```bash
+npx create-mcp-node soil-carbon
+npx create-mcp-node econ-damage --no-tests      # ← no tests
+npx create-mcp-node climate-model --docker-off  # ← no Docker/Compose
+npx create-mcp-node my-model --template https://github.com/user/custom-template
+```
+
+## Generated Project Structure
+
+```
+my-model/
+├── node.py              # Main model implementation
+├── metadata.json        # Model metadata and schema (validated against JSON-Schema)
+├── requirements.txt     # Python dependencies
+├── Dockerfile           # Container configuration
+├── docker-compose.yml   # Local development stack
+├── tests/               # Unit test suite
+│   ├── test_model.py    # Model unit tests
+│   └── conftest.py      # Test configuration
+├── .github/             # CI/CD workflows
+│   └── workflows/
+│       └── test.yml     # Automated testing (uses public SDK GitHub Action)
+└── README.md            # Project documentation
+```
+
+## Template Customization
+
+You can create custom templates by forking the [official template repository](https://github.com/<your-org>/template-node) and modifying:
+
+- **`template/`** - Source files to copy
+- **`template.json`** - Template configuration
+- **`hooks/`** - Post-generation scripts
+
+## Environment Variables
+
+| Variable           | Description                    | Default / Example                                  |
+|--------------------|-------------------------------|----------------------------------------------------|
+| `MCP_TEMPLATE_URL` | Default template repository   | `https://github.com/mcp-sim/template-node`         |
+| `MCP_NO_ANALYTICS` | Disable usage analytics       | `false`                                            |
+
+## Troubleshooting
+
+### Common Issues
+
+**Permission denied on `npx`:**
+```bash
+sudo npm install -g create-mcp-node
+create-mcp-node my-model
+```
+
+**Template download fails:**
+```bash
+# Use alternative CDN
+npx create-mcp-node@latest my-model
+```
+
+**Docker not found:**
+```bash
+# Skip Docker files
+npx create-mcp-node my-model --docker-off
+```
+
+**jsonschema validation fails:**
+```text
+# Check your metadata.json against the MCP-Sim schema v0.1 for required fields and types.
+```

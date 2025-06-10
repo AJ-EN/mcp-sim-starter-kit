@@ -1,0 +1,77 @@
+---
+title: FAQ
+sidebar_position: 10
+---
+
+# Frequently Asked Questions (FAQ)
+
+Here are some common questions about `MCP-Sim`.
+
+## General
+
+**What is MCP-Sim?**
+
+`MCP-Sim` (Model Composition Platform - Simulation) is a system that turns scientific formulas, machine learning models, or empirical equations into composable microservices.  
+It allows researchers and developers to easily deploy, discover, chain, and validate these "micro-models" via a standardized API.
+
+**Who is MCP-Sim for?**
+
+It's for scientists, engineers, researchers, and developers who work with mathematical models and want to:
+
+* Make their models easily accessible as APIs.
+* Discover and use models created by others.
+* Compose complex simulations by chaining multiple models.
+* Standardize model deployment and execution.
+
+## Technical
+
+**Do I need GPUs to run model nodes?**
+
+No, not necessarily. The default model node setup using the Python SDK and Flask is CPU-based and suitable for many types of models.  
+GPU support for computationally intensive models (e.g., deep learning) is planned for future SDK versions and custom node implementations.  
+If your model requires PyTorch + CUDA, you can base your Dockerfile on `nvidia/cuda` and expose GPU resources via Docker’s `--gpus` flag.
+
+**How do credits work?**
+
+- New users typically receive a starting balance of free credits (e.g., 100 credits) upon signup to the platform.  
+- Each model node, in its `metadata.json`, can define a `cost_per_call` (in credits) for executing its capabilities.  
+- If `cost_per_call` is omitted, it defaults to **0** (free).  
+- The MCP Router manages the credit ledger, deducting credits from the user's account for each successful model execution.
+
+**Can I run model nodes privately?**
+
+Yes. If you run your own MCP Router instance, you can configure your model nodes to register only with your private router.  
+Additionally, a model node can be run without registering with any router if you intend to call its API directly.  
+Set the environment variable `MCP_REGISTER_ON_STARTUP=false` (or a similar mechanism in the SDK) to prevent a node from attempting to register with a public or default registry.
+
+**What programming languages can I use to build a model node?**
+
+While the primary SDK is currently for Python, the MCP (Model Control Protocol) is language-agnostic as it's based on JSON-RPC over HTTP.  
+You can, in principle, implement an MCP-compliant model node in any language that can run an HTTP server and handle JSON.  
+We plan to release SDKs for other popular languages in the future.
+
+**How are models versioned?**
+
+Models are versioned using semantic versioning (e.g., `1.0.0` for Major.Minor.Patch) specified in their `metadata.json`.  
+The `model_id` should also ideally include the major version (e.g., `my-model-v1`) to distinguish between non-backward-compatible versions.  
+See [Schema Spec](../04-schema-spec) for versioning rules.
+
+## Contributing & Community
+
+**How can I contribute a model?**
+
+Please see our [Contributing Guide](contributing) for details on how to develop, document, and submit your model node. We have a bounty program for accepted models!
+
+**Where can I find existing models?**
+
+The MCP-Sim platform will feature a community marketplace or model browser where you can discover and learn about registered models.  
+_This feature is coming soon._
+
+**Is there a community forum or Discord?**
+
+Join our Discord → [https://discord.gg/abc123](https://discord.gg/abc123)
+
+---
+
+Have another question?  
+Feel free to [open an issue on GitHub](https://github.com/mcp-sim/mcp-sim-starter-kit/issues) or reach out to our team.

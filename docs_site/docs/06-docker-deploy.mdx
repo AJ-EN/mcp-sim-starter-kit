@@ -1,0 +1,136 @@
+---
+title: Docker Deployment
+sidebar_position: 7
+---
+
+# Docker Deployment
+
+Docker is the **easiest** and most reproducible way to package and deploy your MCP-Sim model nodes. It ensures consistency across environments and simplifies integration with the MCP-Sim platform.
+
+## Building Your Docker Image
+
+The `create-mcp-node` tool generates a `Dockerfile` optimized for Python applications.
+
+```bash
+# Navigate to your model's root directory
+cd your-model-node
+
+# Build the Docker image
+# Replace <your-username> and <node-name>
+docker build -t ghcr.io/<your-username>/<node-name>:v0.1.0 .
+```
+**Naming Convention:** We recommend using `ghcr.io/<your-github-username>/<your-repo-name>:<version-tag>` for images pushed to GitHub Container Registry.  
+See the [GitHub Container Registry docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry) for more details.
+
+## Running Your Docker Container Locally
+
+```bash
+# Run the container, mapping container port 5000 to host 5000
+docker run --rm -p 5000:5000 ghcr.io/<your-username>/<node-name>:v0.1.0
+```
+_The base image’s `CMD` already starts on port 5000; adjust `-p` if you changed `serve(port=...)`._
+
+Your model node should now be accessible at `http://localhost:5000`.
+
+## Pushing to a Container Registry
+
+To make your model accessible to the MCP-Sim platform or other users, push it to a container registry like GitHub Container Registry (GHCR) or Docker Hub.
+
+**For GitHub Container Registry (GHCR):**
+
+1.  **Authenticate with GHCR:**
+    ```bash
+    echo $GH_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
+    ```
+    (Use a Personal Access Token with `write:packages` and `read:packages` scopes.)
+
+2.  **Push the image:**
+    ```bash
+    docker push ghcr.io/<your-username>/<node-name>:v0.1.0
+    ```
+
+## Router Auto-Registration
+
+MCP-Sim model nodes can automatically register themselves with an MCP Router instance upon startup. This is controlled by environment variables.
+
+When running your Docker container, set these environment variables:
+
+| Variable                   | Description                                                                 | Example                                      |
+|----------------------------|-----------------------------------------------------------------------------|----------------------------------------------|
+| `MCP_ROUTER_URL`           | The base URL of the MCP Router instance.                                    | `"http://mcp-router:5000"` (in Docker network) |
+| `MCP_NODE_URL`             | The publicly accessible URL of this model node.                             | `"http://my-model-node.example.com:5000"` or `"http://host.docker.internal:5000"` (for local Docker Desktop) |
+| `MCP_REGISTER_ON_STARTUP`  | Set to `"true"` to enable auto-registration.                                | `"true"`                                     |
+
+_If you omit `MCP_NODE_URL`, the router will default to `MCP_ROUTER_URL + /health` (internal network)._
+
+**Example `docker run` with registration:**
+```bash
+docker run --rm -p 5000:5000 \
+  -e MCP_ROUTER_URL="http://<router-host>:5000" \
+  -e MCP_NODE_URL="http://<this-node-public-host>:5000" \
+  -e MCP_REGISTER_ON_STARTUP="true" \
+  ghcr.io/<your-username>/<node-name>:v0.1.0
+```
+
+## Sample `docker-compose.yml` for Local Development
+
+For a local setup involving a router and multiple model nodes, `docker-compose` is invaluable.
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+
+services:
+  mcp-router:
+    image: ghcr.io/mcp-sim/router:latest # Or your custom router image
+    ports:
+      - "8000:5000" # Exposing router on host port 8000
+    environment:
+      - MCP_FRONTEND_URL=http://localhost:3000 # If you have a local frontend
+    networks:
+      - mcp_network
+    restart: unless-stopped
+
+  hydro-model:
+    build: 
+      context: ./hydro-runoff-node # uses Dockerfile scaffold
+    ports:
+      - "5001:5000"
+    environment:
+      - MCP_ROUTER_URL=http://mcp-router:5000
+      - MCP_NODE_URL=http://hydro-model:5000 # Internal Docker network URL
+      - MCP_REGISTER_ON_STARTUP=true
+    depends_on:
+      - mcp-router
+    networks:
+      - mcp_network
+    restart: unless-stopped
+
+  climate-model:
+    image: ghcr.io/username/climate-node:v1.2 # Example pre-built image
+    ports:
+      - "5002:5000"
+    environment:
+      - MCP_ROUTER_URL=http://mcp-router:5000
+      - MCP_NODE_URL=http://climate-model:5000
+      - MCP_REGISTER_ON_STARTUP=true
+    depends_on:
+      - mcp-router
+    networks:
+      - mcp_network
+    restart: unless-stopped
+
+networks:
+  mcp_network:
+    driver: bridge
+```
+
+**To run this stack:**
+```bash
+docker-compose up -d
+```
+
+_Tip: Use `docker compose logs -f mcp-router` to tail router logs for debugging._
+
+This setup allows your models to discover and communicate with the router within the Docker network.
+
+See the [CI page](../05-local-testing) for how to push images automatically on merge.

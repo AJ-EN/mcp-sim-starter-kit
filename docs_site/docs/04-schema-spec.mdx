@@ -1,0 +1,145 @@
+---
+sidebar_position: 5
+---
+
+# Schema Specification (`metadata.json`)
+
+The `metadata.json` file is the heart of your MCP-Sim model. It defines the model's identity, capabilities, and the expected structure of input and output data. This schema ensures interoperability and allows the MCP-Sim platform to automatically generate UIs and validate requests.
+
+## Core Metadata Fields
+
+These fields are required at the root of your `metadata.json`:
+
+| Field             | Type   | Description                                                                 | Example                       |
+|-------------------|--------|-----------------------------------------------------------------------------|-------------------------------|
+| `model_id`        | string | Unique identifier for your model. Convention: `model-name-vMajor`.          | `"hydro-runoff-v1"`           |
+| `version`         | string | Semantic version of your model (e.g., `Major.Minor.Patch`).                 | `"1.0.0"`                     |
+| `name`            | string | Human-readable name for your model.                                         | `"Hydrology Runoff Model"`    |
+| `description`     | string | A brief summary of what your model does.                                    | `"Calculates surface runoff"` |
+| `author`          | string | Name or organization of the model author.                                   | `"MCP-Sim Research Team"`     |
+| `capabilities`    | object | Defines the functions your model exposes. Keys are capability names.        | `{"simulate_runoff": {...}}`  |
+
+## Capability Definition
+
+Each key under the `capabilities` object defines a specific function your model can perform.
+
+| Field           | Type   | Description                                                              |
+|-----------------|--------|--------------------------------------------------------------------------|
+| `description`   | string | Human-readable description of this specific capability.                  |
+| `input_schema`  | object | JSON Schema defining the structure and types of expected input data.     |
+| `output_schema` | object | JSON Schema defining the structure and types of the data this capability returns. |
+
+### Example Capability: `simulate_runoff`
+
+```json
+{
+  "simulate_runoff": {
+    "description": "Calculates surface runoff based on precipitation and evapotranspiration.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "precip_mm": {
+          "type": "number",
+          "description": "Precipitation in millimeters.",
+          "minimum": 0
+        },
+        "et_mm": {
+          "type": "number",
+          "description": "Evapotranspiration in millimeters.",
+          "minimum": 0
+        }
+      },
+      "required": ["precip_mm", "et_mm"]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "runoff_mm": {
+          "type": "number",
+          "description": "Calculated surface runoff in millimeters."
+        }
+      },
+      "required": ["runoff_mm"]
+    }
+  }
+}
+```
+
+## Full `metadata.json` Example
+
+<details>
+<summary>View complete `metadata.json` example</summary>
+
+```json
+{
+  "model_id": "hydro-runoff-v1",
+  "version": "1.0.2",
+  "name": "Hydrology Runoff Model",
+  "description": "A simple model to calculate surface runoff from precipitation and evapotranspiration data using a basic water balance approach.",
+  "author": "MCP-Sim Research Team",
+  "tags": ["hydrology", "water", "runoff", "environment"],
+  "documentation_url": "https://mcp-sim.com/docs/models/hydro-runoff-v1",
+  "icon_url": "https://mcp-sim.com/icons/hydro.svg",
+  "cost_per_call": 1,
+  "capabilities": {
+    "simulate_runoff": {
+      "name": "Simulate Runoff",
+      "description": "Calculates surface runoff based on precipitation and evapotranspiration.",
+      "input_schema": {
+        "type": "object",
+        "title": "Runoff Simulation Inputs",
+        "properties": {
+          "precip_mm": {
+            "type": "number",
+            "title": "Precipitation (mm)",
+            "description": "Total precipitation in millimeters.",
+            "minimum": 0,
+            "default": 10
+          },
+          "et_mm": {
+            "type": "number",
+            "title": "Evapotranspiration (mm)",
+            "description": "Total evapotranspiration in millimeters.",
+            "minimum": 0,
+            "default": 5
+          },
+          "area_km2": {
+            "type": "number",
+            "title": "Catchment Area (km²)",
+            "description": "Area of the catchment in square kilometers.",
+            "minimum": 0.01,
+            "optional": true
+          }
+        },
+        "required": ["precip_mm", "et_mm"]
+      },
+      "output_schema": {
+        "type": "object",
+        "title": "Runoff Simulation Outputs",
+        "properties": {
+          "runoff_mm": {
+            "type": "number",
+            "title": "Runoff (mm)",
+            "description": "Calculated surface runoff depth in millimeters."
+          },
+          "runoff_m3": {
+            "type": "number",
+            "title": "Runoff Volume (m³)",
+            "description": "Calculated total runoff volume in cubic meters (if area_km2 provided)."
+          }
+        },
+        "required": ["runoff_mm"]
+      }
+    }
+  }
+}
+```
+</details>
+
+## JSON Schema Resources
+
+- [JSON Schema Official Website](https://json-schema.org/)
+- [Understanding JSON Schema](https://json-schema.org/learn/getting-started-step-by-step.html)
+- [Online JSON Schema Validator](https://www.jsonschemavalidator.net/)
+
+By adhering to this schema, your model becomes a discoverable, verifiable, and composable component within the MCP-Sim ecosystem.

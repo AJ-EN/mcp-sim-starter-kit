@@ -1,0 +1,112 @@
+---
+title: Contributing
+sidebar_position: 9
+---
+
+# Contributing to MCP-Sim
+
+We welcome contributions to the MCP-Sim platform, whether it's new models, improvements to the core SDK, documentation updates, or bug fixes!
+
+## Ways to Contribute
+
+1.  **Develop New Model Nodes:** Create and share new scientific micro-models.
+2.  **Improve Existing Models:** Enhance accuracy, performance, or add new capabilities.
+3.  **Enhance the SDK/Router:** Contribute to the core platform components.
+4.  **Write Documentation:** Help us improve guides, tutorials, and API references.
+5.  **Suggest Features:** Propose new ideas to make MCP-Sim better.
+6.  **Report Bugs:** Identify and report issues with clear, reproducible steps.
+
+## Development Workflow (Code Contributions)
+
+1.  **Fork the Repository:**
+    Start by forking the relevant MCP-Sim repository (e.g., `mcp-sim/mcp-node-sdk`, `mcp-sim/router`, or the public starter kit [`mcp-sim-starter-kit`](https://github.com/mcp-sim/mcp-sim-starter-kit)) to your GitHub account.
+
+2.  **Clone Your Fork:**
+    ```bash
+    git clone https://github.com/<your-username>/<repository-name>.git
+    cd <repository-name>
+    ```
+
+3.  **Create a Branch:**
+    Create a new branch for your changes. Use a descriptive name (e.g., `feat/soil-carbon-model`, `fix/hydro/correct-runoff-coeff`).
+    ```bash
+    git checkout -b feat/soil-carbon-model
+    ```
+
+4.  **Make Your Changes:**
+    Implement your feature, bug fix, or improvement.
+    *   Follow the coding style guide (see below).
+    *   Write unit tests for new functionality.
+    *   Run **`pytest -q`** and ensure all tests pass.
+
+5.  **Run Pre-commit Hooks:**
+    If the project uses pre-commit hooks, ensure they pass:
+    ```bash
+    pip install pre-commit==3.6.0
+    pre-commit install
+    pre-commit run --all-files
+    ```
+    Commit any changes made by the hooks.
+
+6.  **Commit Your Changes:**
+    Use clear and concise commit messages, following [Conventional Commits](https://www.conventionalcommits.org/).
+    ```bash
+    git add .
+    git commit -m "fix(hydro): correct runoff coeff"
+    ```
+
+7.  **Push to Your Fork:**
+    ```bash
+    git push origin feat/soil-carbon-model
+    ```
+
+8.  **Open a Pull Request (PR):**
+    Go to the original MCP-Sim repository on GitHub and open a Pull Request from your branch to the `main` (or `develop`) branch of the upstream repository.
+    *   Provide a clear description of your changes in the PR.
+    *   Link to any relevant issues.
+
+## CI & Pre-commit Checks
+
+All PRs must pass Continuous Integration (CI) checks, which typically include:
+*   Running `pytest` for all unit tests.
+*   Linting (e.g., Flake8).
+*   Code formatting (e.g., Black, isort).
+*   `jsonschema` validation (`metadata.json`).
+
+Ensure your code passes all local pre-commit hooks and tests before pushing.
+
+## Coding Style
+
+*   **Python:** Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/). We use [Black](https://github.com/psf/black) for code formatting and [isort](https://pycqa.github.io/isort/) for import sorting.
+*   **Docstrings:** Use [Google Python Style Docstrings](https://google.github.io/styleguide/pyguide.html#3.8-comments-and-docstrings). For Pydantic models, field docstrings will appear in auto-generated schemas.
+*   **Commit Messages:** Follow [Conventional Commits](https://www.conventionalcommits.org/) if possible.  
+    Example: `fix(hydro): correct runoff coeff`
+
+## Licensing
+
+*   Contributions to the core MCP-Sim platform (SDK, Router) are typically under the Apache-2.0 License.
+*   New model nodes contributed to the community marketplace can be licensed under **MIT or Apache-2.0 only**. Please include a `LICENSE` file in your model repository.
+*   If you add third-party code, ensure licence compatibility.
+
+## Model Node Bounty Program
+
+🎉 **Earn 1,000 MCP-Sim credits!** 🎉
+
+For each new, unique, and well-documented scientific model node that is accepted into the official MCP-Sim community marketplace (or a designated community repository), the primary contributor(s) will receive a bounty of 1,000 MCP-Sim platform credits.
+
+**Criteria for Bounty:**
+*   Model must be scientifically valid and provide a useful capability.
+*   Must include comprehensive `metadata.json` as per schema.
+*   Must include working unit tests (`pytest`).
+*   Must be containerized with a `Dockerfile`.
+*   Must have clear documentation (README, docstrings).
+*   Must be licensed under MIT or Apache-2.0.
+*   Must be approved and merged by the MCP-Sim maintainers.
+*   One bounty per unique capability; duplicates may not qualify.
+
+**How to claim:**  
+Open a GitHub Discussion or post in [Discord](https://discord.gg/xxxxx) after your PR is merged.
+
+## Questions?
+
+Join our [Discord invite](https://discord.gg/xxxxx) or open an issue on GitHub if you have questions about contributing.

@@ -1,0 +1,176 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mcp-sim.dev/schemas/metadata.schema.json",
+  "title": "MCP Model Node Metadata Schema",
+  "description": "Schema for model node metadata and capabilities",
+  "type": "object",
+  "required": [
+    "model_id",
+    "name",
+    "version",
+    "capabilities",
+    "endpoints",
+    "cost_per_call"
+  ],
+  "properties": {
+    "model_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "Unique identifier for the model (lowercase, alphanumeric, hyphens, underscores)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Human-readable name of the model"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Detailed description of what the model does"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (e.g., 1.0.0)"
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z_]+$",
+        "description": "Capability identifier (lowercase, underscores only)"
+      },
+      "description": "List of capabilities this model provides"
+    },
+    "endpoints": {
+      "type": "object",
+      "required": ["execute", "health"],
+      "properties": {
+        "execute": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Relative path to the execution endpoint"
+        },
+        "health": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Relative path to the health check endpoint"
+        },
+        "docs": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Optional path to API documentation"
+        }
+      }
+    },
+    "cost_per_call": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Cost per execution in credits"
+    },
+    "input_schema": {
+      "type": "object",
+      "description": "JSON Schema defining expected input parameters for each capability",
+      "patternProperties": {
+        "^[a-z_]+$": {
+          "type": "object",
+          "properties": {
+            "type": { "const": "object" },
+            "properties": { "type": "object" },
+            "required": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "description": "JSON Schema defining output format for each capability",
+      "patternProperties": {
+        "^[a-z_]+$": {
+          "type": "object"
+        }
+      }
+    },
+    "cost_model": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["fixed", "variable", "time_based"],
+          "description": "How costs are calculated"
+        },
+        "base_cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Base cost per execution"
+        },
+        "variable_factors": {
+          "type": "object",
+          "description": "Factors that affect variable pricing"
+        }
+      }
+    },
+    "resource_requirements": {
+      "type": "object",
+      "properties": {
+        "cpu_cores": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 64
+        },
+        "gpu_required": {
+          "type": "boolean"
+        },
+        "estimated_execution_time_seconds": {
+          "type": "number",
+          "minimum": 0.1
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_-]+$"
+      },
+      "description": "Tags for categorization and discovery"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "organization": { "type": "string" },
+        "website": { "type": "string", "format": "uri" }
+      }
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "patternProperties": {
+    "^x-": {
+      "description": "Extension fields (must start with x-)"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Defines the core variables for the light theme */
+:root {
+  --ifm-font-family-base: 'Inter', sans-serif;
+  --ifm-font-color-base: #000000;
+  
+  /* Pure white background */
+  --ifm-background-color: #FFFFFF;
+
+  /* A subtle blue for links and accents */
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d4ed8;
+  --ifm-color-primary-darker: #1e40af;
+  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary-lighter: #60a5fa;
+
+  /* Remove distracting shadows */
+  --ifm-navbar-shadow: none;
+  --ifm-footer-shadow: none;
+  
+  /* Subtler lines and borders */
+  --ifm-hr-border-color: #e5e7eb;
+  --ifm-toc-border-color: #e5e7eb;
+  --ifm-global-card-border-radius: 4px;
+}
+
+/* Defines the core variables for the dark theme */
+html[data-theme='dark'] {
+  --ifm-font-color-base: #FFFFFF;
+
+  /* Pure black background */
+  --ifm-background-color: #000000;
+  
+  /* A slightly brighter blue for links in dark mode */
+  --ifm-color-primary: #3b82f6;
+  --ifm-color-primary-dark: #60a5fa;
+  --ifm-color-primary-darker: #93c5fd;
+  --ifm-color-primary-light: #2563eb;
+  --ifm-color-primary-lighter: #1d4ed8;
+  
+  /* Even subtler lines and borders for dark mode */
+  --ifm-hr-border-color: #262626;
+  --ifm-toc-border-color: #262626;
+  
+  /* Make code blocks slightly less black to stand out */
+  --ifm-code-background: #0a0a0a;
+}
+
+/* Further style overrides for a minimal look */
+.navbar, .footer {
+  background-color: var(--ifm-background-color) !important;
+}
+
+.card {
+  border: 1px solid var(--ifm-hr-border-color);
+}
