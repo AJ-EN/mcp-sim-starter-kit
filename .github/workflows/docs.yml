@@ -3,9 +3,9 @@ name: Deploy Documentation Site
 on:
   push:
     branches: [main]
-    # Corrected Path: Only run if files inside 'docs_site' change
     paths:
       - 'docs_site/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,11 +31,9 @@ jobs:
         with:
           node-version: '18'
           cache: npm
-          # Corrected Path: Point to the lock file inside docs_site
           cache-dependency-path: docs_site/package-lock.json
           
       - name: Install dependencies
-        # Corrected Step: Use working-directory to run the command
         working-directory: ./docs_site
         run: npm ci
         
@@ -49,7 +47,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Corrected Path: The build output is now here
           path: ./docs_site/build
           
       - name: Deploy to GitHub Pages
