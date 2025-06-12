@@ -1,0 +1,40 @@
+{
+  "model_id": "__NODE_ID__",
+  "name": "__NODE_NAME__",
+  "version": "0.1.0",
+  "description": "Generated MCP model node",
+  "capabilities": ["simulate"],
+  "endpoints": {
+    "execute": "/mcp/execute",
+    "health": "/health"
+  },
+  "input_schema": {
+    "simulate": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "string",
+          "description": "Input data for simulation"
+        }
+      },
+      "required": ["input"]
+    }
+  },
+  "output_schema": {
+    "simulate": {
+      "type": "object",
+      "properties": {
+        "echo": {
+          "type": "string",
+          "description": "Echo of input data"
+        }
+      },
+      "required": ["echo"]
+    }
+  },
+  "cost_per_call": 1.0,
+  "tags": ["generated", "template"],
+  "author": {
+    "name": "MCP-Sim Generator"
+  }
+}
